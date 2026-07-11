@@ -1,4 +1,4 @@
-# # ResearchMind AI
+# # ResearchNavigtor AI
 
 An intelligent PDF research assistant built with Retrieval-Augmented Generation (RAG):
 
