@@ -1,0 +1,41 @@
+"""
+llm.py
+Handles communication with the local Ollama LLM.
+"""
+
+import ollama
+
+DEFAULT_MODEL = "llama3.2:1b"
+
+
+def check_ollama_available():
+    """Check whether Ollama is running and reachable."""
+    try:
+        ollama.list()
+        return True
+    except Exception:
+        return False
+
+
+def ask_llama(question, contexts, model_name=DEFAULT_MODEL):
+    """Send the question and retrieved context to the local LLM."""
+    context_text = "\n\n".join(contexts)
+
+    prompt = f"""Use ONLY the context below to answer. If the answer isn't in the context, say so.
+
+Context:
+{context_text}
+
+Question:
+{question}
+
+Answer:"""
+
+    try:
+        response = ollama.chat(
+            model=model_name,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response["message"]["content"]
+    except Exception as e:
+        return f"⚠️ Could not reach Ollama ({e}). Make sure `ollama run {model_name}` works in a terminal."
