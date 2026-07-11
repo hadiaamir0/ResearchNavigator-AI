@@ -33,8 +33,3 @@ ollama pull llama3.1
 streamlit run streamlit_app.py
 ```
 
-## Notes
-
-- If the PDF is scanned (image-only), text extraction will fail — you'd need OCR first (e.g. `pytesseract`), which isn't included here.
-- Ollama must be running locally (`ollama serve` or via the desktop app) before you ask questions.
-
