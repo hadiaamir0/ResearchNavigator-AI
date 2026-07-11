@@ -1,0 +1,41 @@
+"""
+pdf_utils.py
+Handles PDF text extraction and splitting text into chunks.
+"""
+
+import fitz  # PyMuPDF
+
+
+def extract_text(pdf_file):
+    """Extract all text from an uploaded PDF file."""
+    pdf = fitz.open(stream=pdf_file.read(), filetype="pdf")
+    text = ""
+    for page in pdf:
+        text += page.get_text()
+    pdf.close()
+    return text
+
+
+def chunk_text(text, chunk_size=1000, overlap=200):
+    """
+    Split text into overlapping chunks without cutting words in half.
+    """
+    words = text.split()
+    chunks = []
+    current_chunk = []
+    current_len = 0
+
+    for word in words:
+        current_chunk.append(word)
+        current_len += len(word) + 1
+
+        if current_len >= chunk_size:
+            chunks.append(" ".join(current_chunk))
+            overlap_words = current_chunk[-(overlap // 6):]
+            current_chunk = overlap_words
+            current_len = sum(len(w) + 1 for w in overlap_words)
+
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
