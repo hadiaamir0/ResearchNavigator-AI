@@ -1,0 +1,34 @@
+"""
+vector_store.py
+Handles embedding generation and FAISS vector search.
+"""
+
+import faiss
+import numpy as np
+import streamlit as st
+from sentence_transformers import SentenceTransformer
+
+
+@st.cache_resource
+def load_embedding_model():
+    """Load the sentence embedding model once and cache it."""
+    return SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+
+def build_vector_db(chunks, model):
+    """Create a FAISS index from a list of text chunks."""
+    embeddings = model.encode(chunks, show_progress_bar=False)
+    embeddings = np.array(embeddings).astype("float32")
+    dimension = embeddings.shape[1]
+    index = faiss.IndexFlatL2(dimension)
+    index.add(embeddings)
+    return index
+
+
+def retrieve_context(question, index, chunks, model, top_k=3):
+    """Find the most relevant chunks for a given question."""
+    q_embedding = model.encode([question])
+    q_embedding = np.array(q_embedding).astype("float32")
+    top_k = min(top_k, len(chunks))
+    distances, indices = index.search(q_embedding, top_k)
+    return [chunks[idx] for idx in indices[0]]
